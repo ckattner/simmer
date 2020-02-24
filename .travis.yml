@@ -1,0 +1,25 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=b2689967e1b2c3b5781da37cfc0eb4e0058178a78bba54294bf0c2a7c9e5cb63
+language: ruby
+rvm:
+  # Build on the latest stable of all supported Rubies (https://www.ruby-lang.org/en/downloads/):
+  - 2.3.8
+  - 2.4.6
+  - 2.5.5
+  - 2.6.5
+cache: bundler
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+script:
+  - bundle exec rubocop
+  - bundle exec rspec spec --format documentation
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+addons:
+  # https://docs.travis-ci.com/user/uploading-artifacts/
+  artifacts:
+    paths:
+      - Gemfile.lock

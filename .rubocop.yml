@@ -1,0 +1,25 @@
+Layout/LineLength:
+  Max: 100
+  Exclude:
+    - simmer.gemspec
+
+Metrics/BlockLength:
+  ExcludedMethods:
+    - let
+    - it
+    - describe
+    - context
+    - specify
+    - define
+
+Metrics/MethodLength:
+  Max: 25
+
+AllCops:
+  TargetRubyVersion: 2.3
+
+Metrics/AbcSize:
+  Max: 16
+
+Metrics/ClassLength:
+  Max: 125
