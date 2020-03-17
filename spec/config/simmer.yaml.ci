@@ -1,0 +1,25 @@
+mysql_database_defaults: &mysql_database_defaults
+  init_command: "SET @@SESSION.sql_mode = 'TRADITIONAL,NO_AUTO_VALUE_ON_ZERO'"
+  database: simmer_test
+
+mysql_database:
+  <<: *mysql_database_defaults
+  username: root
+  host: 127.0.0.1
+  port: 3306
+  flags: MULTI_STATEMENTS
+
+spoon_client:
+  dir: spec/mocks/spoon
+  args: 0
+
+local_file_system:
+  dir: tmp/store-test
+
+# aws_file_system:
+#   access_key_id:
+#   bucket:
+#   default_expires_in_seconds: 3600
+#   encryption: AES256
+#   region:
+#   secret_access_key:

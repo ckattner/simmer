@@ -5,21 +5,35 @@ require './lib/simmer/version'
 Gem::Specification.new do |s|
   s.name        = 'simmer'
   s.version     = Simmer::VERSION
-  s.summary     = 'Put in a summary'
+  s.summary     = 'Pentaho Data Integration Automated Test Suite'
 
   s.description = <<-DESCRIPTION
-    Put in a description.
+    Provides a harness for testing Pentaho Data Integration jobs and transformations.
   DESCRIPTION
 
   s.authors     = ['Matthew Ruggio']
   s.email       = ['mruggio@bluemarblepayroll.com']
-  s.files       = `git ls-files`.split("\n")
-  s.test_files  = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
+  s.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  s.bindir      = 'exe'
+  s.executables = %w[simmer]
   s.homepage    = 'https://github.com/bluemarblepayroll/simmer'
   s.license     = 'MIT'
+  s.metadata    = {
+    'bug_tracker_uri' => 'https://github.com/bluemarblepayroll/simmer/issues',
+    'changelog_uri' => 'https://github.com/bluemarblepayroll/simmer/blob/master/CHANGELOG.md',
+    'documentation_uri' => 'https://www.rubydoc.info/gems/simmer',
+    'homepage_uri' => s.homepage,
+    'source_code_uri' => s.homepage
+  }
 
-  s.required_ruby_version = '>= 2.3.8'
+  s.required_ruby_version = '>= 2.5'
+
+  s.add_dependency('acts_as_hashable', '~>1')
+  s.add_dependency('aws-sdk-s3', '~>1.6')
+  s.add_dependency('mysql2', '~>0.5')
+  s.add_dependency('objectable', '~>1')
+  s.add_dependency('pdi', '~>1')
+  s.add_dependency('stringento', '~>2')
 
   s.add_development_dependency('guard-rspec', '~>4.7')
   s.add_development_dependency('pry', '~>0')

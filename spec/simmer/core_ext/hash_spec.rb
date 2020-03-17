@@ -7,6 +7,10 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-module Simmer
-  VERSION = '1.0.0-alpha.8'
+require 'spec_helper'
+
+describe Simmer::CoreExt::Hash do
+  specify 'Hash#symbolize_keys is implemented' do
+    expect({ 'a' => 'b' }.symbolize_keys).to eq(a: 'b')
+  end
 end

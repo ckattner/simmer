@@ -7,6 +7,8 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-module Simmer
-  VERSION = '1.0.0-alpha.8'
+class Out
+  def puts(msg); end
+
+  def print(msg); end
 end

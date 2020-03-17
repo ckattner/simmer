@@ -7,6 +7,6 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-module Simmer
-  VERSION = '1.0.0-alpha.8'
-end
+require_relative 'util/evaluator'
+require_relative 'util/record_set'
+require_relative 'util/yaml_reader'

@@ -7,6 +7,4 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-module Simmer
-  VERSION = '1.0.0-alpha.8'
-end
+require_relative 'database/fixture_set'

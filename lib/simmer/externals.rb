@@ -7,6 +7,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 
-module Simmer
-  VERSION = '1.0.0-alpha.8'
-end
+require_relative 'externals/aws_file_system'
+require_relative 'externals/local_file_system'
+require_relative 'externals/mysql_database'
+require_relative 'externals/spoon_client'

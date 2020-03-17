@@ -1,18 +1,22 @@
 env:
   global:
-    - CC_TEST_REPORTER_ID=b2689967e1b2c3b5781da37cfc0eb4e0058178a78bba54294bf0c2a7c9e5cb63
+    - CC_TEST_REPORTER_ID=48c3a48cc3c203ac365190a30b3c0a9aae0d2c10c9a86735e654f23b8660bb02
 language: ruby
+services:
+  - mysql
 rvm:
   # Build on the latest stable of all supported Rubies (https://www.ruby-lang.org/en/downloads/):
-  - 2.3.8
-  - 2.4.6
   - 2.5.5
   - 2.6.5
+  - 2.7.0
 cache: bundler
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
+  - cp spec/config/simmer.yaml.ci spec/config/simmer.yaml
+  - cat spec/db/database.sql | mysql
+  - cat spec/db/tables.sql | mysql
 script:
   - bundle exec rubocop
   - bundle exec rspec spec --format documentation

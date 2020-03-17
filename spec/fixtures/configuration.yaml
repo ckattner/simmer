@@ -1,0 +1,11 @@
+aws_file_system:
+  aws_file_system_key: aws_file_system_value
+
+mysql_database:
+  mysql_database_key: mysql_database_value
+
+spoon_client:
+  spoon_client_key: spoon_client_value
+
+other:
+  other_key: other_value

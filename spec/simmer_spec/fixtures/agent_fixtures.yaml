@@ -1,0 +1,14 @@
+hulk:
+  table: agents
+  fields:
+    call_sign: hulk
+    first: CLASSIFIED
+    last: CLASSIFIED
+
+iron_man:
+  table: agents
+  fields:
+    call_sign: iron_man
+    first: CLASSIFIED
+    last: CLASSIFIED
+

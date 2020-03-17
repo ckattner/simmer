@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Examples:
+# - ./bin/simmer
+# - ./bin/simmer ./simmer/specs/transformations/examples
+# - ./bin/simmer ./simmer/specs/transformations/examples/update_user_name.yaml
+
+require 'simmer'
+
+exit 1 unless Simmer.run(ARGV[0]).pass?
