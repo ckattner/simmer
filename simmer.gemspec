@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.add_dependency('aws-sdk-s3', '~>1.6')
   s.add_dependency('mysql2', '~>0.5')
   s.add_dependency('objectable', '~>1')
-  s.add_dependency('pdi', '~>1')
+  s.add_dependency('pdi', '~>2')
   s.add_dependency('stringento', '~>2')
 
   s.add_development_dependency('guard-rspec', '~>4.7')

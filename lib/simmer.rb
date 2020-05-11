@@ -66,6 +66,21 @@ module Simmer
       Configuration.new(raw_config, simmer_dir)
     end
 
+    def make_runner(configuration, out)
+      database     = make_mysql_database(configuration)
+      file_system  = make_file_system(configuration)
+      fixture_set  = make_fixture_set(configuration)
+      spoon_client = make_spoon_client(configuration)
+
+      Runner.new(
+        database: database,
+        file_system: file_system,
+        fixture_set: fixture_set,
+        out: out,
+        spoon_client: spoon_client
+      )
+    end
+
     private
 
     def yaml_reader
@@ -80,21 +95,6 @@ module Simmer
 
         Specification.make(config)
       end
-    end
-
-    def make_runner(configuration, out)
-      database     = make_mysql_database(configuration)
-      file_system  = make_file_system(configuration)
-      fixture_set  = make_fixture_set(configuration)
-      spoon_client = make_spoon_client(configuration)
-
-      Runner.new(
-        database: database,
-        file_system: file_system,
-        fixture_set: fixture_set,
-        out: out,
-        spoon_client: spoon_client
-      )
     end
 
     def make_fixture_set(configuration)
@@ -142,7 +142,7 @@ module Simmer
 
     def make_spoon_client(configuration)
       config     = (configuration.spoon_client_config || {}).symbolize_keys
-      spoon_args = config.slice(:args, :dir, :kitchen, :pan)
+      spoon_args = config.slice(:args, :dir, :kitchen, :pan, :timeout_in_seconds)
       spoon      = Pdi::Spoon.new(spoon_args)
 
       Externals::SpoonClient.new(configuration.files_dir, spoon)

@@ -13,7 +13,6 @@ module Simmer
     class Reporter
       DATA_FILE    = 'data.yaml'
       PDI_OUT_FILE = 'pdi_out.txt'
-      PDI_ERR_FILE = 'pdi_err.txt'
 
       def initialize(session_result)
         raise ArgumentError, 'session_result is required' unless session_result
@@ -29,12 +28,10 @@ module Simmer
         IO.write(data_path(dir), session_result.to_h.to_yaml)
 
         pdi_out_file = File.open(pdi_out_path(dir), 'w')
-        pdi_err_file = File.open(pdi_err_path(dir), 'w')
 
-        write_part(session_result.runner_results, pdi_out_file, pdi_err_file)
+        write_part(session_result.runner_results, pdi_out_file)
 
         pdi_out_file.close
-        pdi_err_file.close
 
         self
       end
@@ -51,25 +48,19 @@ module Simmer
         File.join(dir, PDI_OUT_FILE)
       end
 
-      def pdi_err_path(dir)
-        File.join(dir, PDI_ERR_FILE)
-      end
-
       def setup_directory(dir)
         File.expand_path(dir).tap do |expanded_dir|
           FileUtils.mkdir_p(expanded_dir)
         end
       end
 
-      def write_part(runner_results, pdi_out_file, pdi_err_file)
+      def write_part(runner_results, pdi_out_file)
         runner_results.each do |runner_result|
           name         = runner_result.name
           runner_id    = runner_result.id
           out_contents = runner_result.spoon_client_result.execution_result.out
-          err_contents = runner_result.spoon_client_result.execution_result.err
 
           write_block(pdi_out_file, name, runner_id, out_contents)
-          write_block(pdi_err_file, name, runner_id, err_contents)
         end
 
         nil

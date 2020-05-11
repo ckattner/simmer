@@ -11,20 +11,23 @@ require 'spec_helper'
 require './spec/mocks/out'
 
 describe Simmer do
+  let(:src_config_path) { File.join('spec', 'config', 'simmer.yaml') }
+  let(:config)          { yaml_read(src_config_path) }
+
   def stage_simmer_config(spoon_dir, args)
-    src_config_path  = File.join('spec', 'config', 'simmer.yaml')
     dest_config_dir  = File.join('tmp')
     dest_config_path = File.join(dest_config_dir, 'simmer.yaml')
 
     FileUtils.rm(dest_config_path) if File.exist?(dest_config_path)
     FileUtils.mkdir_p(dest_config_dir)
 
-    config = yaml_read(src_config_path)
-
-    new_config = config.merge('spoon_client' => {
-                                'dir' => spoon_dir,
-                                'args' => args
-                              })
+    new_config = config.merge(
+      'spoon_client' => {
+        'dir' => spoon_dir,
+        'args' => args,
+        'timeout_in_seconds' => config.dig('spoon_client', 'timeout_in_seconds')
+      }
+    )
 
     IO.write(dest_config_path, new_config.to_yaml)
 
@@ -85,7 +88,7 @@ describe Simmer do
       end
     end
 
-    context 'when pdi accts correctly but judge fails on output assert' do
+    context 'when pdi acts correctly but judge fails on output assert' do
       let(:spoon_path)  { File.join('spec', 'mocks', 'load_noc_list_bad_output') }
       let(:args)        { '' }
 
@@ -98,6 +101,28 @@ describe Simmer do
         )
 
         expect(results.pass?).to be false
+      end
+    end
+
+    describe '#make_runner' do
+      let(:spoon_path)  { File.join('spec', 'mocks', 'load_noc_list_bad_output') }
+      let(:args)        { '' }
+
+      subject do
+        described_class.make_runner(
+          described_class.make_configuration(
+            config_path: config_path,
+            simmer_dir: simmer_dir
+          ),
+          $stdout
+        )
+      end
+
+      it 'sets Pdi::Spoon#timeout_in_seconds from configuration' do
+        actual   = subject.spoon_client.spoon.executor.timeout_in_seconds
+        expected = config.dig('spoon_client', 'timeout_in_seconds')
+
+        expect(actual).to eq(expected)
       end
     end
   end

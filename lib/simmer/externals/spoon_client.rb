@@ -13,6 +13,8 @@ module Simmer
   module Externals
     # Wraps up Pdi::Spoon at a higher-level for Simmer to consume.
     class SpoonClient
+      attr_reader :spoon
+
       def initialize(files_dir, spoon)
         raise ArgumentError, 'spoon is required' unless spoon
 
@@ -46,7 +48,7 @@ module Simmer
 
       private
 
-      attr_reader :files_dir, :spoon
+      attr_reader :files_dir
 
       def execute!(specification, config)
         act = specification.act

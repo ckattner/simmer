@@ -12,6 +12,7 @@ mysql_database:
 spoon_client:
   dir: spec/mocks/spoon
   args: 0
+  timeout_in_seconds: 90
 
 local_file_system:
   dir: tmp/store-test
