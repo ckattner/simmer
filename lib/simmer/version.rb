@@ -8,5 +8,5 @@
 #
 
 module Simmer
-  VERSION = '2.1.0-alpha'
+  VERSION = '2.1.0'
 end
