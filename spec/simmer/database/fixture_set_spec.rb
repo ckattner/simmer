@@ -47,8 +47,10 @@ describe Simmer::Database::FixtureSet do
         expect(subject.get!(name)).to eq(expected)
       end
 
-      it 'raises ArgumentError if name does not exist' do
-        expect { subject.get!(:doesnt_exist) }.to raise_error(ArgumentError)
+      it 'raises FixtureMissingError if name does not exist' do
+        err = described_class::FixtureMissingError
+
+        expect { subject.get!(:doesnt_exist) }.to raise_error(err)
       end
     end
 
@@ -67,8 +69,10 @@ describe Simmer::Database::FixtureSet do
         expect(subject.get!(name)).to eq(expected)
       end
 
-      it 'raises ArgumentError if name does not exist' do
-        expect { subject.get!(:doesnt_exist) }.to raise_error(ArgumentError)
+      it 'raises FixtureMissingError if name does not exist' do
+        err = described_class::FixtureMissingError
+
+        expect { subject.get!(:doesnt_exist) }.to raise_error(err)
       end
     end
   end

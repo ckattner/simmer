@@ -13,7 +13,7 @@ module Simmer
     class Result
       attr_reader :bad_assertions
 
-      def initialize(bad_assertions)
+      def initialize(bad_assertions = [])
         @bad_assertions = bad_assertions
 
         freeze

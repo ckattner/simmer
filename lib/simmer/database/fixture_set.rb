@@ -13,6 +13,8 @@ module Simmer
   module Database
     # Hydrate a collection of Fixture instances from configuration.
     class FixtureSet
+      class FixtureMissingError < StandardError; end
+
       def initialize(config = {})
         @fixtures_by_name = config_to_fixures_by_name(config)
 
@@ -22,7 +24,7 @@ module Simmer
       def get!(name)
         key = name.to_s
 
-        raise ArgumentError, "fixture not found: #{name}" unless fixtures_by_name.key?(key)
+        raise FixtureMissingError, "fixture missing: #{name}" unless fixtures_by_name.key?(key)
 
         fixtures_by_name[key]
       end

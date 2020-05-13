@@ -1,0 +1,10 @@
+name: I am purposefully missing fixtures
+stage:
+  fixtures:
+    - i_do_not_exist
+act:
+  name: does_not_matter
+  repository: does_not_matter
+  type: transformation
+assert:
+  assertions:

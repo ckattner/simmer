@@ -22,6 +22,7 @@ module Simmer
       def pass?
         !fail?
       end
+      alias passing? pass?
 
       def fail?
         runner_results.any?(&:fail?)

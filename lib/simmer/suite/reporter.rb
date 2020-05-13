@@ -58,7 +58,7 @@ module Simmer
         runner_results.each do |runner_result|
           name         = runner_result.name
           runner_id    = runner_result.id
-          out_contents = runner_result.spoon_client_result.execution_result.out
+          out_contents = runner_result.execution_output
 
           write_block(pdi_out_file, name, runner_id, out_contents)
         end

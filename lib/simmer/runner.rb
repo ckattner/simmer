@@ -30,24 +30,45 @@ module Simmer
       print("Name: #{specification.name}")
       print("Path: #{specification.path}")
 
-      clean_db
-      seed_db(specification)
-      clean_file_system
-      seed_file_system(specification)
+      clean_and_seed(specification)
 
       spoon_client_result = execute_spoon(specification, config)
       judge_result        = assert(specification, spoon_client_result)
 
-      Result.new(id, judge_result, specification, spoon_client_result).tap do |result|
-        msg = pass_message(result)
-        print_waiting('Done', 'Final verdict')
-        print(msg)
+      Result.new(
+        id: id,
+        judge_result: judge_result,
+        specification: specification,
+        spoon_client_result: spoon_client_result
+      ).tap do |result|
+        print_result(result)
+      end
+    rescue Database::FixtureSet::FixtureMissingError, Timeout::Error => e
+      Result.new(
+        id: id,
+        specification: specification,
+        errors: e.message
+      ).tap do |result|
+        print_result(result)
       end
     end
 
     private
 
     attr_reader :database, :file_system, :fixture_set, :judge, :out
+
+    def print_result(result)
+      msg = pass_message(result)
+      print_waiting('Done', 'Final verdict')
+      print(msg)
+    end
+
+    def clean_and_seed(specification)
+      clean_db
+      seed_db(specification)
+      clean_file_system
+      seed_file_system(specification)
+    end
 
     def clean_db
       print_waiting('Stage', 'Cleaning database')
@@ -66,6 +87,9 @@ module Simmer
       print("#{count} record(s) inserted")
 
       count
+    rescue Database::FixtureSet::FixtureMissingError => e
+      print('Missing Fixture(s)')
+      raise e
     end
 
     def clean_file_system
@@ -86,11 +110,22 @@ module Simmer
 
     def execute_spoon(specification, config)
       print_waiting('Act', 'Executing Spoon')
+
       spoon_client_result = spoon_client.run(specification, config)
-      msg = pass_message(spoon_client_result)
+      time_in_seconds     = spoon_client_result.time_in_seconds
+      code                = spoon_client_result.execution_result.status.code
+
+      msg = [
+        pass_message(spoon_client_result),
+        "(Exited with code #{code} after #{time_in_seconds} seconds)"
+      ].join(' ')
+
       print(msg)
 
       spoon_client_result
+    rescue Timeout::Error => e
+      print('Timed out')
+      raise e
     end
 
     def assert(specification, spoon_client_result)

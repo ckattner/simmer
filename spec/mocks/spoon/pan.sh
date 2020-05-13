@@ -8,6 +8,8 @@ output(){
   echo "$1"
 }
 
+sleep $2
+
 output "output to stdout"
 error "output to sterr"
 
