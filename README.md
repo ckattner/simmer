@@ -281,6 +281,15 @@ Basic steps to take to get this repository compiling:
 3. Clone the repository (git clone git@github.com:bluemarblepayroll/simmer.git)
 4. Navigate to the root folder (cd simmer)
 5. Install dependencies (bundle)
+6. Create the 'simmer_test' MySQL database as defined in `spec/db/tables.sql`.
+7. Add the tables from `spec/db/tables.sql` to this database.
+8. Configure your test simmer.yaml:
+
+````bash
+cp spec/config/simmer.yaml.ci spec/config/simmer.yaml
+```
+
+9. Edit `spec/config/simmer.yaml` so that it can connect to the database created in step seven.
 
 ### Running Tests
 
