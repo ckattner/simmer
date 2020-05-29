@@ -27,12 +27,6 @@ module Simmer
 
         IO.write(data_path(dir), session_result.to_h.to_yaml)
 
-        pdi_out_file = File.open(pdi_out_path(dir), 'w')
-
-        write_part(session_result.runner_results, pdi_out_file)
-
-        pdi_out_file.close
-
         self
       end
 
@@ -52,31 +46,6 @@ module Simmer
         File.expand_path(dir).tap do |expanded_dir|
           FileUtils.mkdir_p(expanded_dir)
         end
-      end
-
-      def write_part(runner_results, pdi_out_file)
-        runner_results.each do |runner_result|
-          name         = runner_result.name
-          runner_id    = runner_result.id
-          out_contents = runner_result.execution_output
-
-          write_block(pdi_out_file, name, runner_id, out_contents)
-        end
-
-        nil
-      end
-
-      def write_block(file, name, runner_id, contents)
-        hyphens = '-' * 80
-
-        file.write("#{hyphens}\n")
-        file.write("Name: #{name}\n")
-        file.write("Runner ID: #{runner_id}\n")
-        file.write("#{hyphens}\n")
-        file.write("#{contents}\n")
-        file.write("\n")
-
-        nil
       end
     end
   end

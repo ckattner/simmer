@@ -15,12 +15,13 @@ module Simmer
   class Runner
     attr_reader :spoon_client
 
-    def initialize(database:, file_system:, fixture_set:, out:, spoon_client:)
+    def initialize(database:, file_system:, fixture_set:, out:, pdi_out:, spoon_client:)
       @database     = database
       @file_system  = file_system
       @fixture_set  = fixture_set
       @judge        = Judge.new(database)
       @out          = out
+      @pdi_out = pdi_out
       @spoon_client = spoon_client
 
       freeze
@@ -31,6 +32,8 @@ module Simmer
       print("Path: #{specification.path}")
 
       clean_and_seed(specification)
+
+      pdi_out.demarcate_spec(id, specification.name)
 
       spoon_client_result = execute_spoon(specification, config)
       judge_result        = assert(specification, spoon_client_result)
@@ -55,7 +58,7 @@ module Simmer
 
     private
 
-    attr_reader :database, :file_system, :fixture_set, :judge, :out
+    attr_reader :database, :file_system, :fixture_set, :judge, :out, :pdi_out
 
     def print_result(result)
       msg = pass_message(result)
@@ -111,7 +114,12 @@ module Simmer
     def execute_spoon(specification, config)
       print_waiting('Act', 'Executing Spoon')
 
-      spoon_client_result = spoon_client.run(specification, config)
+      spoon_client_result = spoon_client.run(specification, config) do |output|
+        pdi_out.write(output)
+      end
+
+      pdi_out.finish_spec
+
       time_in_seconds     = spoon_client_result.time_in_seconds
       code                = spoon_client_result.execution_result.status.code
 

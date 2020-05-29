@@ -24,13 +24,13 @@ module Simmer
         freeze
       end
 
-      def run(specification, config)
+      def run(specification, config, &output_capturer)
         execution_result = nil
         time_in_seconds  = nil
 
         begin
           time_in_seconds = Benchmark.measure do
-            execution_result = execute!(specification, config)
+            execution_result = execute!(specification, config, &output_capturer)
           end.real
         rescue Pdi::Spoon::PanError, Pdi::Spoon::KitchenError => e
           return Result.new(
@@ -50,14 +50,15 @@ module Simmer
 
       attr_reader :files_dir
 
-      def execute!(specification, config)
+      def execute!(specification, config, &output_capturer)
         act = specification.act
 
         spoon.run(
           repository: act.repository,
           name: act.name,
           params: act.compiled_params(files_dir, config),
-          type: act.type
+          type: act.type,
+          &output_capturer
         )
       end
     end

@@ -77,7 +77,8 @@ module Simmer
         file_system: file_system,
         fixture_set: fixture_set,
         out: out,
-        spoon_client: spoon_client
+        spoon_client: spoon_client,
+        pdi_out: Suite::PdiOutputWriter.new(setup_directory(configuration.results_dir))
       )
     end
 
@@ -152,9 +153,18 @@ module Simmer
       Suite.new(
         config: configuration.config,
         out: out,
-        results_dir: configuration.results_dir,
+        results_dir: setup_directory(configuration.results_dir),
         runner: runner
       )
+    end
+
+    # TODO: find a good home for this
+    def setup_directory(dir)
+      File.expand_path(dir).tap do |expanded_dir|
+        FileUtils.mkdir_p(expanded_dir)
+      end
+
+      dir
     end
   end
 end

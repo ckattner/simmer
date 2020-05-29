@@ -7,6 +7,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 
+require_relative 'suite/pdi_output_writer'
 require_relative 'suite/reporter'
 require_relative 'suite/result'
 
