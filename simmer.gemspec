@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
     Provides a harness for testing Pentaho Data Integration jobs and transformations.
   DESCRIPTION
 
-  s.authors     = ['Matthew Ruggio']
+  s.authors     = ['Matthew Ruggio', 'Ryan Gerry']
   s.email       = ['mruggio@bluemarblepayroll.com']
   s.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   s.bindir      = 'exe'
