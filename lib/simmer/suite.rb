@@ -8,7 +8,7 @@
 #
 
 require_relative 'suite/pdi_output_writer'
-require_relative 'suite/reporter'
+require_relative 'suite/results_writer'
 require_relative 'suite/result'
 
 module Simmer
@@ -42,7 +42,7 @@ module Simmer
           out.puts('Suite ended but was not successful')
         end
 
-        Reporter.new(result).write!(results_dir)
+        ResulstWriter.new(result).write!(results_dir)
 
         out.puts("Results can be viewed at #{results_dir}")
       end

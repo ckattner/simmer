@@ -10,10 +10,10 @@
 module Simmer
   class Suite
     # Understands how to write a SessionResult instance to disk.
-    class Reporter
-      DATA_FILE    = 'data.yaml'
-      PDI_OUT_FILE = 'pdi_out.txt'
+    class ResulstWriter
+      DATA_FILE = 'data.yaml'
 
+      # Pass in dir here:
       def initialize(session_result)
         raise ArgumentError, 'session_result is required' unless session_result
 
