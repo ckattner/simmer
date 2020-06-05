@@ -15,25 +15,24 @@ module Simmer
   class Runner
     attr_reader :spoon_client
 
+    # Note that the parameter list is long but at least they are keyword args.
+    # rubocop:disable Metrics/ParameterLists
     def initialize(database:, file_system:, fixture_set:, out:, pdi_out:, spoon_client:)
       @database     = database
       @file_system  = file_system
       @fixture_set  = fixture_set
       @judge        = Judge.new(database)
       @out          = out
-      @pdi_out = pdi_out
+      @pdi_out      = pdi_out
       @spoon_client = spoon_client
 
       freeze
     end
+    # rubocop:enable Metrics/ParameterLists
 
     def run(specification, config: {}, id: SecureRandom.uuid)
-      print("Name: #{specification.name}")
-      print("Path: #{specification.path}")
-
+      announce_start(id, specification)
       clean_and_seed(specification)
-
-      pdi_out.demarcate_spec(id, specification.name)
 
       spoon_client_result = execute_spoon(specification, config)
       judge_result        = assert(specification, spoon_client_result)
@@ -56,9 +55,19 @@ module Simmer
       end
     end
 
+    def complete
+      pdi_out.close
+    end
+
     private
 
     attr_reader :database, :file_system, :fixture_set, :judge, :out, :pdi_out
+
+    def announce_start(id, specification)
+      print("Name: #{specification.name}")
+      print("Path: #{specification.path}")
+      pdi_out.demarcate_spec(id, specification.name)
+    end
 
     def print_result(result)
       msg = pass_message(result)
@@ -120,12 +129,9 @@ module Simmer
 
       pdi_out.finish_spec
 
-      time_in_seconds     = spoon_client_result.time_in_seconds
-      code                = spoon_client_result.execution_result.status.code
-
       msg = [
         pass_message(spoon_client_result),
-        "(Exited with code #{code} after #{time_in_seconds} seconds)"
+        spoon_execution_detail_message(spoon_client_result),
       ].join(' ')
 
       print(msg)
@@ -173,6 +179,11 @@ module Simmer
 
     def pass_message(obj)
       obj.pass? ? 'Pass' : 'Fail'
+    end
+
+    def spoon_execution_detail_message(spoon_client_result)
+      code = spoon_client_result.execution_result.status.code
+      "(Exited with code #{code} after #{spoon_client_result.time_in_seconds} seconds)"
     end
   end
 end

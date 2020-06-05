@@ -34,15 +34,12 @@ module Simmer
 
     def run(specifications)
       runner_results = run_all_specs(specifications)
+      runner.complete
 
       Result.new(runner_results).tap do |result|
-        if result.pass?
-          out.puts('Suite ended successfully')
-        else
-          out.puts('Suite ended but was not successful')
-        end
+        output_summary(result.pass?)
 
-        ResulstWriter.new(result).write!(results_dir)
+        ResulstWriter.new(result, results_dir).write!
 
         out.puts("Results can be viewed at #{results_dir}")
       end
@@ -77,6 +74,14 @@ module Simmer
 
     def print_line
       out.puts('-' * LINE_LENGTH)
+    end
+
+    def output_summary(passed)
+      if passed
+        out.puts('Suite ended successfully')
+      else
+        out.puts('Suite ended but was not successful')
+      end
     end
   end
 end

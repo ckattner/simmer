@@ -7,4 +7,4 @@ gemspec
 # TODO: remove this:
 gem 'pdi',
     git: 'https://github.com/bluemarblepayroll/pdi.git',
-    ref: 'bd2162f86a5affbeda736f9d95528232a2d8f21a'
+    ref: '73af3d36efb442cab9c3761a7e63b3aad334eca2'

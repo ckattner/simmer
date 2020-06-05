@@ -14,16 +14,18 @@ module Simmer
       DATA_FILE = 'data.yaml'
 
       # Pass in dir here:
-      def initialize(session_result)
+      def initialize(session_result, results_dir)
         raise ArgumentError, 'session_result is required' unless session_result
+        raise ArgumentError, 'results_directory is required' unless results_dir
 
         @session_result = session_result
+        @results_directory = results_dir
 
         freeze
       end
 
-      def write!(dir)
-        dir = setup_directory(dir)
+      def write!
+        dir = Util::FileSystem.setup_directory(results_directory)
 
         IO.write(data_path(dir), session_result.to_h.to_yaml)
 
@@ -32,7 +34,7 @@ module Simmer
 
       private
 
-      attr_reader :session_result
+      attr_reader :results_directory, :session_result
 
       def data_path(dir)
         File.join(dir, DATA_FILE)
@@ -40,12 +42,6 @@ module Simmer
 
       def pdi_out_path(dir)
         File.join(dir, PDI_OUT_FILE)
-      end
-
-      def setup_directory(dir)
-        File.expand_path(dir).tap do |expanded_dir|
-          FileUtils.mkdir_p(expanded_dir)
-        end
       end
     end
   end

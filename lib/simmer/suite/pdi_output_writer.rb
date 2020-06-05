@@ -18,6 +18,7 @@ module Simmer
       def initialize(results_dir)
         raise ArgumentError, 'results_dir is required' unless results_dir
 
+        results_dir = Util::FileSystem.setup_directory(results_dir)
         @out = File.new(File.join(results_dir, PDI_OUT_FILE), 'w')
 
         freeze
@@ -40,7 +41,6 @@ module Simmer
         out.puts
       end
 
-      # TODO: call this somewhere
       def close
         out.close
       end
