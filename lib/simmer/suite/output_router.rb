@@ -37,9 +37,12 @@ module Simmer
       end
 
       def waiting(stage, msg)
-        console_puts(
+        # This is not for debugging.
+        # rubocop:disable Lint/Debugger
+        console.print(
           "  > #{pad_right(stage, 6)} - #{pad_right(msg, WAITING_MAX_WIDTH, WAITING_PADDING_CHAR)}"
         )
+        # rubocop:enable Lint/Debugger
       end
 
       def spoon_execution_detail_message(spoon_client_result)
