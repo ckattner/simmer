@@ -12,3 +12,14 @@ iron_man:
     first: CLASSIFIED
     last: CLASSIFIED
 
+reserved1:
+  table: table
+  fields:
+    column: reserved1
+    count: 1
+
+reserved2:
+  table: table
+  fields:
+    column: reserved2
+    count: 2

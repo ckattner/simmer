@@ -9,7 +9,8 @@
 
 CLEAN_SQL_STATEMENTS = [
   'DELETE FROM `simmer_test`.`notes`',
-  'DELETE FROM `simmer_test`.`agents`'
+  'DELETE FROM `simmer_test`.`agents`',
+  'DELETE FROM `simmer_test`.`table`'
 ].freeze
 
 def db_helper_config

@@ -1,0 +1,26 @@
+name: Handle MySQL Reserved Words
+stage:
+  files:
+    src: noc_list.csv
+    dest: input/noc_list.csv
+  fixtures:
+    - reserved1
+    - reserved2
+act:
+  name: load_noc_list
+  repository: top_secret
+  type: transformation
+assert:
+  assertions:
+    - type: table
+      name: table
+      records:
+        - column: reserved1
+          count: 1
+        - column: reserved2
+          count: 1
+    - type: table
+      name: table
+      logic: includes
+      records:
+        - column: reserved1

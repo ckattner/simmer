@@ -27,7 +27,7 @@ module Simmer
       end
 
       def records(table, columns = [])
-        query = "SELECT #{sql_select_params(columns)} FROM #{table}"
+        query = "SELECT #{sql_select_params(columns)} FROM `#{table}`"
 
         client.query(query).to_a
       end
@@ -53,7 +53,7 @@ module Simmer
       attr_reader :client, :fixture_set, :table_names
 
       def sql_select_params(columns)
-        Array(columns).any? ? Array(columns).map { |c| client.escape(c) }.join(',') : '*'
+        Array(columns).any? ? Array(columns).map { |c| "`#{client.escape(c)}`" }.join(',') : '*'
       end
 
       def seed_sql_statements(fixtures)
@@ -62,7 +62,7 @@ module Simmer
 
       def clean_sql_statements
         table_names.map do |table_name|
-          "TRUNCATE #{table_name}"
+          "TRUNCATE `#{table_name}`"
         end
       end
 

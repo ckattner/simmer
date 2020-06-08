@@ -11,6 +11,10 @@ Additions:
 
 * pdi_out.txt is written to throughout test execution instead of at the end.
 
+Fixes:
+
+* Seeds now handle identifiers which are MySQL reserved words.
+
 ## 2.1.0 (May 13th, 2020)
 
 Additions:

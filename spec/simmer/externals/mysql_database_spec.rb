@@ -32,37 +32,66 @@ describe Simmer::Externals::MysqlDatabase do
     end
   end
 
-  specify '#seed! adds records' do
-    fixtures = specification.stage.fixtures.map { |f| fixture_set.get!(f) }
+  describe '#seed!' do
+    let(:fixtures) do
+      specification.stage.fixtures.select.map { |f| fixture_set.get!(f) }
+    end
 
-    subject.seed!(fixtures)
+    it 'adds records' do
+      subject.seed!(fixtures)
 
-    actual = db_helper_client.query('SELECT * FROM agents ORDER BY call_sign').to_a
+      actual = db_helper_client.query('SELECT * FROM agents ORDER BY call_sign').to_a
 
-    call_signs = actual.map { |r| r['call_sign'] }
+      call_signs = actual.map { |r| r['call_sign'] }
 
-    expect(call_signs).to eq(%w[hulk iron_man])
+      expect(call_signs).to eq(%w[hulk iron_man])
+    end
+
+    describe 'MySQL reserved words' do
+      # Override:
+      let(:spec_path) { File.join('specifications', 'handle_mysql_reserved_words.yaml') }
+
+      it 'handles them' do
+        subject.seed!(fixtures)
+
+        actual = db_helper_client.query(
+          'SELECT `column`, `count` FROM `table` ORDER BY `column`'
+        ).to_a
+
+        result = actual.map { |r| [r['column'], r['count']] }
+
+        expected = [
+          ['reserved1', 1],
+          ['reserved2', 2],
+        ]
+        expect(result).to eq expected
+      end
+    end
   end
 
   specify '#clean! removes all records without worrying about foreign keys' do
     db_helper_client.query("INSERT INTO agents (id, call_sign) VALUES (1, 'thor')")
     db_helper_client.query("INSERT INTO notes (agent_id, note) VALUES (1, 'thor')")
+    db_helper_client.query("INSERT INTO `table` (id, `column`, `count`) VALUES (1, 'foo', 3)")
 
     agent_count = db_helper_client.query('SELECT * FROM agents').to_a.length
-    note_count  = db_helper_client.query('SELECT * FROM notes').to_a.length
+    note_count = db_helper_client.query('SELECT * FROM notes').to_a.length
+    reserved_word_count = db_helper_client.query('SELECT * FROM `table`').to_a.length
 
     expect(agent_count).to eq(1)
     expect(note_count).to  eq(1)
+    expect(reserved_word_count).to eq(1)
 
     table_count = subject.clean!
 
-    expect(table_count).to eq(2)
+    expect(table_count).to eq(3)
   end
 
   describe '#records' do
     before(:each) do
       db_helper_client.query("INSERT INTO agents (id, call_sign) VALUES (1, 'thor')")
       db_helper_client.query("INSERT INTO agents (id, call_sign) VALUES (2, 'black_widow')")
+      db_helper_client.query("INSERT INTO `table` (id, `column`, `count`) VALUES (1, 'foo', 3)")
     end
 
     specify 'when fields is empty' do
@@ -80,7 +109,21 @@ describe Simmer::Externals::MysqlDatabase do
           'call_sign' => 'black_widow',
           'first' => nil,
           'last' => nil
-        }
+        },
+      ]
+
+      expect(actual).to eq(expected)
+    end
+
+    specify 'reads tables with reserved words as identifiers' do
+      actual = subject.records(:table)
+
+      expected = [
+        {
+          'id' => 1,
+          'column' => 'foo',
+          'count' => 3
+        },
       ]
 
       expect(actual).to eq(expected)
