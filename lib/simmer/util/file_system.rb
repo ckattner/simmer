@@ -12,7 +12,7 @@ require_relative 'resolver'
 module Simmer
   module Util
     # Provides convenience methods for working with the file system.
-    class FileSystem
+    class FileSystem # :nodoc:
       class << self
         def setup_directory(dir_path)
           File.expand_path(dir_path).tap do |expanded_dir|

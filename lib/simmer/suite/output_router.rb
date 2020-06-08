@@ -2,7 +2,8 @@
 
 module Simmer
   class Suite
-    # Routes output either to the console or the <tt>PdiOutputWriter</tt>.
+    # Routes output either to the console or the <tt>PdiOutputWriter</tt>. It
+    # also provides some methods to help format output.
     class OutputRouter
       extend Forwardable
 

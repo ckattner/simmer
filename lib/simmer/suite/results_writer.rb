@@ -19,7 +19,7 @@ module Simmer
         raise ArgumentError, 'results_directory is required' unless results_dir
 
         @session_result = session_result
-        @results_directory = results_dir
+        @results_directory = Util::FileSystem.setup_directory(results_dir)
 
         freeze
       end
