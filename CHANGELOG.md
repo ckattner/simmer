@@ -5,6 +5,7 @@
 Breaking Changes:
 
 * `Simmer::Runner` now accepts a `Simmer::Suite::OutputRouter` instead of an `IO` instance as its 'out' parameter.
+* The `execution_output` and `execution_result` methods have been removed from `Simmer::Runner::Result`.
 
 Additions:
 

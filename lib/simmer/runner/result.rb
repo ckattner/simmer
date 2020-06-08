@@ -61,14 +61,6 @@ module Simmer
           'errors' => errors,
         }
       end
-
-      def execution_output
-        execution_result&.out
-      end
-
-      def execution_result
-        spoon_client_result&.execution_result
-      end
     end
   end
 end
