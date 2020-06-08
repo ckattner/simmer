@@ -10,7 +10,7 @@
 module Simmer
   class Suite
     # Captures PDI output from multiple specifications to a single file.
-    class PdiOutputWriter
+    class PdiOutputWriter # :nodoc:
       PDI_OUT_FILE = 'pdi_out.txt'
 
       attr_reader :results_dir

@@ -39,10 +39,6 @@ module Simmer
       def data_path(dir)
         File.join(dir, DATA_FILE)
       end
-
-      def pdi_out_path(dir)
-        File.join(dir, PDI_OUT_FILE)
-      end
     end
   end
 end

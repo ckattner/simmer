@@ -1,4 +1,16 @@
-# 2.1.0 (May 13th, 2020)
+# Simmer Change Log
+
+## 3.0.0 (June 8th, 2020)
+
+Breaking Changes:
+
+* `Simmer::Runner` now accepts a `Simmer::Suite::OutputRouter` instead of an `IO` instance as its 'out' parameter.
+
+Additions:
+
+* pdi_out.txt is written to throughout test execution instead of at the end.
+
+## 2.1.0 (May 13th, 2020)
 
 Additions:
 
@@ -6,7 +18,7 @@ Additions:
 * Do not make PDI timeouts short-circuit the rest of the test suite.
 * Report PDI's exit code and execution time to the console.
 
-# 2.0.0 (May 11th, 2020)
+## 2.0.0 (May 11th, 2020)
 
 Breaking Changes:
 

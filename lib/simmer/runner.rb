@@ -15,23 +15,19 @@ module Simmer
   class Runner
     attr_reader :spoon_client
 
-    # Note that the parameter list is long but at least they are keyword args.
-    # rubocop:disable Metrics/ParameterLists
-    def initialize(database:, file_system:, fixture_set:, out:, pdi_out:, spoon_client:)
+    def initialize(database:, file_system:, fixture_set:, out:, spoon_client:)
       @database     = database
       @file_system  = file_system
       @fixture_set  = fixture_set
       @judge        = Judge.new(database)
       @out          = out
-      @pdi_out      = pdi_out
       @spoon_client = spoon_client
 
       freeze
     end
-    # rubocop:enable Metrics/ParameterLists
 
     def run(specification, config: {}, id: SecureRandom.uuid)
-      announce_start(id, specification)
+      out.announce_start(id, specification)
       clean_and_seed(specification)
 
       spoon_client_result = execute_spoon(specification, config)
@@ -43,7 +39,7 @@ module Simmer
         specification: specification,
         spoon_client_result: spoon_client_result
       ).tap do |result|
-        print_result(result)
+        out.final_verdict(result)
       end
     rescue Database::FixtureSet::FixtureMissingError, Timeout::Error => e
       Result.new(
@@ -51,29 +47,17 @@ module Simmer
         specification: specification,
         errors: e.message
       ).tap do |result|
-        print_result(result)
+        out.final_verdict(result)
       end
     end
 
     def complete
-      pdi_out.close
+      out.close
     end
 
     private
 
-    attr_reader :database, :file_system, :fixture_set, :judge, :out, :pdi_out
-
-    def announce_start(id, specification)
-      print("Name: #{specification.name}")
-      print("Path: #{specification.path}")
-      pdi_out.demarcate_spec(id, specification.name)
-    end
-
-    def print_result(result)
-      msg = pass_message(result)
-      print_waiting('Done', 'Final verdict')
-      print(msg)
-    end
+    attr_reader :database, :file_system, :fixture_set, :judge, :out
 
     def clean_and_seed(specification)
       clean_db
@@ -83,107 +67,72 @@ module Simmer
     end
 
     def clean_db
-      print_waiting('Stage', 'Cleaning database')
+      out.waiting('Stage', 'Cleaning database')
       count = database.clean!
-      print("#{count} table(s) emptied")
+      out.console_puts("#{count} table(s) emptied")
 
       count
     end
 
     def seed_db(specification)
-      print_waiting('Stage', 'Seeding database')
+      out.waiting('Stage', 'Seeding database')
 
       fixtures = specification.stage.fixtures.map { |f| fixture_set.get!(f) }
       count    = database.seed!(fixtures)
 
-      print("#{count} record(s) inserted")
+      out.console_puts("#{count} record(s) inserted")
 
       count
     rescue Database::FixtureSet::FixtureMissingError => e
-      print('Missing Fixture(s)')
+      out.console_puts('Missing Fixture(s)')
       raise e
     end
 
     def clean_file_system
-      print_waiting('Stage', 'Cleaning File System')
+      out.waiting('Stage', 'Cleaning File System')
       count = file_system.clean!
-      print("#{count} file(s) deleted")
+      out.console_puts("#{count} file(s) deleted")
 
       count
     end
 
     def seed_file_system(specification)
-      print_waiting('Stage', 'Seeding File System')
+      out.waiting('Stage', 'Seeding File System')
       count = file_system.write!(specification.stage.files)
-      print("#{count} file(s) uploaded")
+      out.console_puts("#{count} file(s) uploaded")
 
       count
     end
 
     def execute_spoon(specification, config)
-      print_waiting('Act', 'Executing Spoon')
+      out.waiting('Act', 'Executing Spoon')
 
       spoon_client_result = spoon_client.run(specification, config) do |output|
-        pdi_out.write(output)
+        out.capture_spoon_output(output)
       end
 
-      pdi_out.finish_spec
-
-      msg = [
-        pass_message(spoon_client_result),
-        spoon_execution_detail_message(spoon_client_result),
-      ].join(' ')
-
-      print(msg)
+      out.finish_spec
+      out.spoon_execution_detail_message(spoon_client_result)
 
       spoon_client_result
     rescue Timeout::Error => e
-      print('Timed out')
+      out.console_puts('Timed out')
       raise e
     end
 
     def assert(specification, spoon_client_result)
-      print_waiting('Assert', 'Checking results')
+      out.waiting('Assert', 'Checking results')
 
       if spoon_client_result.fail?
-        print('Skipped')
+        out.console_puts('Skipped')
         return nil
       end
 
       output       = spoon_client_result.execution_result.out
       judge_result = judge.assert(specification, output)
-      msg          = pass_message(judge_result)
-
-      print(msg)
+      out.result(judge_result)
 
       judge_result
-    end
-
-    def print(msg)
-      out.puts(msg)
-    end
-
-    def print_waiting(stage, msg)
-      max  = 25
-      char = '.'
-      msg  = "  > #{pad_right(stage, 6)} - #{pad_right(msg, max, char)}"
-
-      out.print(msg)
-    end
-
-    def pad_right(msg, len, char = ' ')
-      missing = len - msg.length
-
-      "#{msg}#{char * missing}"
-    end
-
-    def pass_message(obj)
-      obj.pass? ? 'Pass' : 'Fail'
-    end
-
-    def spoon_execution_detail_message(spoon_client_result)
-      code = spoon_client_result.execution_result.status.code
-      "(Exited with code #{code} after #{spoon_client_result.time_in_seconds} seconds)"
     end
   end
 end

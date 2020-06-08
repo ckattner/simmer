@@ -51,7 +51,8 @@ module Simmer
     )
       configuration = make_configuration(config_path: config_path, simmer_dir: simmer_dir)
       specs         = make_specifications(path, configuration.tests_dir)
-      runner        = make_runner(configuration, out)
+      out_router    = make_output_router(configuration, out)
+      runner        = make_runner(configuration, out_router)
       suite         = make_suite(configuration, out, runner)
 
       suite.run(specs)
@@ -66,7 +67,7 @@ module Simmer
       Configuration.new(raw_config, simmer_dir)
     end
 
-    def make_runner(configuration, out)
+    def make_runner(configuration, out_router)
       database     = make_mysql_database(configuration)
       file_system  = make_file_system(configuration)
       fixture_set  = make_fixture_set(configuration)
@@ -76,9 +77,8 @@ module Simmer
         database: database,
         file_system: file_system,
         fixture_set: fixture_set,
-        out: out,
-        spoon_client: spoon_client,
-        pdi_out: Suite::PdiOutputWriter.new(configuration.results_dir)
+        out: out_router,
+        spoon_client: spoon_client
       )
     end
 
@@ -156,6 +156,11 @@ module Simmer
         results_dir: configuration.results_dir,
         runner: runner
       )
+    end
+
+    def make_output_router(configuration, console_out)
+      pdi_out = Suite::PdiOutputWriter.new(configuration.results_dir)
+      Simmer::Suite::OutputRouter.new(console_out, pdi_out)
     end
   end
 end
