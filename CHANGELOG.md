@@ -13,7 +13,7 @@ Additions:
 
 Fixes:
 
-* Seeds now handle identifiers which are MySQL reserved words.
+* Fixtures now handle identifiers which are MySQL reserved words.
 
 ## 2.1.0 (May 13th, 2020)
 
