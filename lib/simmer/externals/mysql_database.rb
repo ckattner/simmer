@@ -27,7 +27,7 @@ module Simmer
       end
 
       def records(table, columns = [])
-        query = "SELECT #{sql_select_params(columns)} FROM `#{table}`"
+        query = "SELECT #{sql_select_params(columns)} FROM #{qualify(table)}"
 
         client.query(query).to_a
       end
@@ -53,7 +53,11 @@ module Simmer
       attr_reader :client, :fixture_set, :table_names
 
       def sql_select_params(columns)
-        Array(columns).any? ? Array(columns).map { |c| "`#{client.escape(c)}`" }.join(',') : '*'
+        if Array(columns).any?
+          Array(columns).map { |c| qualify(client.escape(c)).to_s }.join(',')
+        else
+          '*'
+        end
       end
 
       def seed_sql_statements(fixtures)
@@ -62,7 +66,7 @@ module Simmer
 
       def clean_sql_statements
         table_names.map do |table_name|
-          "TRUNCATE `#{table_name}`"
+          "TRUNCATE #{qualify(table_name)}"
         end
       end
 
@@ -109,6 +113,10 @@ module Simmer
         return if name.end_with?(DATABASE_SUFFIX)
 
         raise ArgumentError, "database (#{name}) must end in #{DATABASE_SUFFIX}"
+      end
+
+      def qualify(identifier)
+        "`#{identifier}`"
       end
     end
   end
