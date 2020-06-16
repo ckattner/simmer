@@ -24,7 +24,7 @@ module Simmer
       results_dir:,
       runner:
     )
-      @config      = config || {}
+      @config      = config
       @out         = out
       @resolver    = resolver
       @results_dir = results_dir
@@ -34,15 +34,17 @@ module Simmer
     end
 
     def run(specifications)
-      runner_results = run_all_specs(specifications)
-      runner.complete
+      config.run_suite_with_callbacks do
+        runner_results = run_all_specs(specifications)
+        runner.complete
 
-      Result.new(runner_results).tap do |result|
-        output_summary(result.pass?)
+        Result.new(runner_results).tap do |result|
+          output_summary(result.pass?)
 
-        ResulstWriter.new(result, results_dir).write!
+          ResulstWriter.new(result, results_dir).write!
 
-        out.puts("Results can be viewed at #{results_dir}")
+          out.puts("Results can be viewed at #{results_dir}")
+        end
       end
     end
 

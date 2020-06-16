@@ -26,28 +26,24 @@ module Simmer
       freeze
     end
 
-    def run(specification, config: {}, id: SecureRandom.uuid)
+    def run(specification, config:, id: SecureRandom.uuid)
       out.announce_start(id, specification)
-      clean_and_seed(specification)
 
-      spoon_client_result = execute_spoon(specification, config)
-      judge_result        = assert(specification, spoon_client_result)
+      config.run_single_test_with_callbacks do
+        clean_and_seed(specification)
 
-      Result.new(
-        id: id,
-        judge_result: judge_result,
-        specification: specification,
-        spoon_client_result: spoon_client_result
-      ).tap do |result|
-        out.final_verdict(result)
-      end
-    rescue Database::FixtureSet::FixtureMissingError, Timeout::Error => e
-      Result.new(
-        id: id,
-        specification: specification,
-        errors: e.message
-      ).tap do |result|
-        out.final_verdict(result)
+        spoon_client_result = execute_spoon(specification, config)
+        judge_result        = assert(specification, spoon_client_result)
+
+        Result.new(
+          id: id,
+          judge_result: judge_result,
+          specification: specification,
+          spoon_client_result: spoon_client_result
+        ).tap { |result| out.final_verdict(result) }
+      rescue Database::FixtureSet::FixtureMissingError, Timeout::Error => e
+        Result.new(id: id, specification: specification, errors: e.message)
+              .tap { |result| out.final_verdict(result) }
       end
     end
 
@@ -107,7 +103,7 @@ module Simmer
     def execute_spoon(specification, config)
       out.waiting('Act', 'Executing Spoon')
 
-      spoon_client_result = spoon_client.run(specification, config) do |output|
+      spoon_client_result = spoon_client.run(specification, config.config) do |output|
         out.capture_spoon_output(output)
       end
 

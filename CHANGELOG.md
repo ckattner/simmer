@@ -1,5 +1,9 @@
 # Simmer Change Log
 
+## 3.1.0 (TBD, 2020)
+
+* Support for custom test lifecycle hooks to be run before and after a every test or the entire suite.
+
 ## 3.0.0 (June 8th, 2020)
 
 Breaking Changes:

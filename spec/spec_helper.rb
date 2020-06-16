@@ -20,6 +20,11 @@ unless ENV['DISABLE_SIMPLECOV'] == 'true'
   end
 end
 
+RSpec.configure do |c|
+  c.filter_run focus: true
+  c.run_all_when_everything_filtered = true
+end
+
 require './lib/simmer'
 
 def fixture_path(*filename)

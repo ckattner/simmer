@@ -7,10 +7,14 @@
 # LICENSE file in the root directory of this source tree.
 #
 
+require_relative 'configuration/callback_dsl'
+
 module Simmer
   # Reads in the Simmer configuration file and options and provides it to the rest of the
   # Simmer implementation.
   class Configuration
+    extend Forwardable
+
     # Configuration Keys
     AWS_FILE_SYSTEM_KEY   = :aws_file_system
     LOCAL_FILE_SYSTEM_KEY = :local_file_system
@@ -32,10 +36,14 @@ module Simmer
 
     attr_reader :config
 
-    def initialize(config, simmer_dir, resolver: Objectable.resolver)
+    # :nodoc:
+    def_delegators :callbacks, :run_single_test_with_callbacks, :run_suite_with_callbacks
+
+    def initialize(config, simmer_dir, resolver: Objectable.resolver, callbacks: nil)
       @config      = config || {}
       @resolver    = resolver
       @simmer_dir  = simmer_dir
+      @callbacks   = callbacks
 
       freeze
     end
@@ -82,7 +90,8 @@ module Simmer
 
     private
 
-    attr_reader :resolver,
+    attr_reader :callbacks,
+                :resolver,
                 :simmer_dir,
                 :yaml_reader
 

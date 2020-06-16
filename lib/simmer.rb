@@ -58,13 +58,13 @@ module Simmer
       suite.run(specs)
     end
 
-    def make_configuration(
-      config_path: DEFAULT_CONFIG_PATH,
-      simmer_dir: DEFAULT_SIMMER_DIR
-    )
+    def make_configuration(config_path: DEFAULT_CONFIG_PATH, simmer_dir: DEFAULT_SIMMER_DIR)
       raw_config = yaml_reader.smash(config_path)
+      Configuration.new(raw_config, simmer_dir, callbacks: callback_configuration)
+    end
 
-      Configuration.new(raw_config, simmer_dir)
+    def callback_configuration
+      @callback_configuration ||= Configuration::CallbackDsl.new
     end
 
     def make_runner(configuration, out_router)
@@ -80,6 +80,18 @@ module Simmer
         out: out_router,
         spoon_client: spoon_client
       )
+    end
+
+    def configure(&block)
+      # TODO: support the arity 1 case
+      # if block_given?
+      #   if block.arity == 1
+      #     yield self
+      #   else
+      #     instance_eval &block
+      #   end
+      # end
+      callback_configuration.instance_eval(&block)
     end
 
     private
@@ -151,7 +163,7 @@ module Simmer
 
     def make_suite(configuration, out, runner)
       Suite.new(
-        config: configuration.config,
+        config: configuration,
         out: out,
         results_dir: configuration.results_dir,
         runner: runner

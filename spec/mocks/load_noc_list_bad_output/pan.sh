@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require './spec/spec_helper'
 require './spec/db_helper'
 
 puts 'bad output!'

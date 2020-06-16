@@ -62,7 +62,7 @@ describe Simmer do
       let(:spoon_path)  { File.join('spec', 'mocks', 'spoon') }
       let(:args)        { 1 }
 
-      specify 'judge determines it does not pass' do
+      it 'fails' do
         results = described_class.run(
           spec_path,
           config_path: config_path,
@@ -78,31 +78,79 @@ describe Simmer do
       let(:spoon_path)  { File.join('spec', 'mocks', 'load_noc_list') }
       let(:args)        { '' }
 
-      specify 'judge determines it to pass' do
-        results = described_class.run(
+      # TODO: extract this to the top level, if they are all the same
+      let(:results) do
+        described_class.run(
           spec_path,
           config_path: config_path,
           out: out,
           simmer_dir: simmer_dir
         )
+      end
 
+      specify 'the judge determines it to pass' do
         expect(results).to be_passing
+      end
+
+      describe 'user defined lifecycle callbacks' do
+        it 'calls them in the expected order' do
+          found_order = []
+
+          described_class.configure do
+            before(:suite) { found_order.push(:before_suite) }
+            before(:each) { found_order.push(:before_each) }
+            after(:each) { found_order.push(:after_each) }
+            after(:suite) { found_order.push(:after_suite) }
+          end
+
+          expect(results).to be_passing
+          expect(found_order).to eq %i[before_suite before_each after_each after_suite]
+        end
+
+        it 'passes the passing result to "after" callbacks' do
+          after_each_result = nil
+          after_suite_result = nil
+
+          described_class.configure do
+            after(:each) { |result| after_each_result = result }
+            after(:suite) { |result| after_suite_result = result }
+          end
+
+          expect(results).to be_passing
+          expect(after_each_result).to be_passing
+          expect(after_suite_result).to be_passing
+        end
       end
     end
 
     context 'when pdi acts correctly but judge fails on output assert' do
       let(:spoon_path)  { File.join('spec', 'mocks', 'load_noc_list_bad_output') }
       let(:args)        { '' }
-
-      specify 'judge determines it to pass' do
-        results = described_class.run(
+      let(:results) do
+        described_class.run(
           spec_path,
           config_path: config_path,
           out: out,
           simmer_dir: simmer_dir
         )
+      end
+
+      specify 'fails' do
+        expect(results).not_to be_passing
+      end
+
+      it 'passes the failing result to "after" callbacks' do
+        after_each_result = nil
+        after_suite_result = nil
+
+        described_class.configure do
+          after(:each) { |result| after_each_result = result }
+          after(:suite) { |result| after_suite_result = result }
+        end
 
         expect(results).not_to be_passing
+        expect(after_each_result).not_to be_passing
+        expect(after_suite_result).not_to be_passing
       end
     end
 
@@ -111,26 +159,30 @@ describe Simmer do
       let(:args)        { [0, 10] }
       let(:config_path) { stage_simmer_config(spoon_path, args, 1) }
 
-      it 'fails' do
-        results = described_class.run(
+      let(:results) do
+        described_class.run(
           spec_path,
           config_path: config_path,
           out: out,
           simmer_dir: simmer_dir
         )
+      end
 
+      it 'fails' do
         expect(results).not_to be_passing
       end
 
-      it 'records error' do
-        results = described_class.run(
-          spec_path,
-          config_path: config_path,
-          out: out,
-          simmer_dir: simmer_dir
-        )
-
+      it 'records the timeout error' do
         expect(results.runner_results.first.errors).to include(/execution expired/)
+      end
+
+      specify 'after each callbacks get a failing result with the timeout error' do
+        after_each_result = nil
+        described_class.configure { after(:each) { |result| after_each_result = result } }
+
+        expect(results).not_to be_passing
+        expect(after_each_result).not_to be_passing
+        expect(after_each_result.errors).to include(/execution expired/)
       end
     end
 

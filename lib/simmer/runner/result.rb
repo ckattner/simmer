@@ -44,6 +44,7 @@ module Simmer
           errors.empty?,
         ].all?
       end
+      alias passing? pass?
 
       def fail?
         !pass?
