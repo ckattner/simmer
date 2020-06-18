@@ -13,7 +13,11 @@ require './spec/mocks/out'
 describe Simmer::ReRunner do
   let(:runner_double) { double(Simmer::Runner) }
   let(:passing_result) { Simmer::Runner::Result.new(id: :timeout, specification: :foo) }
-  let(:out) { StringIO.new }
+  let(:out) do
+    double(Simmer::Suite::OutputRouter).tap do |out|
+      allow(out).to receive(:console_puts)
+    end
+  end
   let(:subject) { described_class.new(runner_double, out) }
 
   it 'delegates to the runner' do
@@ -61,14 +65,12 @@ describe Simmer::ReRunner do
     end
 
     describe 'output' do
-      let(:output) { double(Simmer::Suite::OutputRouter) }
-
       it 'announces that a rerun is occurring due to a timeout' do
-        subject = described_class.new(runner_double, output, timeout_failure_retry_count: 1)
+        subject = described_class.new(runner_double, out, timeout_failure_retry_count: 1)
         expect(runner_double).to receive(:run).and_return(timeout_result)
         expect(runner_double).to receive(:run).and_return(passing_result)
 
-        expect(output).to receive(:puts).with('Retrying due to a timeout...').once
+        expect(out).to receive(:console_puts).with('Retrying due to a timeout...').once
 
         subject.run
       end

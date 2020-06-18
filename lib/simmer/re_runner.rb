@@ -36,7 +36,7 @@ module Simmer
       result = __getobj__.run(*run_args)
 
       if result.timed_out? && times.positive?
-        out.puts('Retrying due to a timeout...')
+        out.console_puts('Retrying due to a timeout...')
         rerun_on_timeout(run_args, times - 1)
       else
         result
