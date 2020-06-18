@@ -42,7 +42,8 @@ module Simmer
           spoon_client_result: spoon_client_result
         ).tap { |result| out.final_verdict(result) }
       rescue Database::FixtureSet::FixtureMissingError, Timeout::Error => e
-        Result.new(id: id, specification: specification, errors: e.message)
+        # TODO: wrap Timeout::Error
+        Result.new(id: id, specification: specification, errors: e)
               .tap { |result| out.final_verdict(result) }
       end
     end

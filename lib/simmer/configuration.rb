@@ -19,6 +19,7 @@ module Simmer
     AWS_FILE_SYSTEM_KEY   = :aws_file_system
     LOCAL_FILE_SYSTEM_KEY = :local_file_system
     MYSQL_DATABASE_KEY    = :mysql_database
+    TIMEOUT_RETRY_KEY     = :timeout_failure_retry_count
     SPOON_CLIENT_KEY      = :spoon_client
 
     # Paths
@@ -66,6 +67,10 @@ module Simmer
 
     def local_file_system?
       config.key?(LOCAL_FILE_SYSTEM_KEY.to_s)
+    end
+
+    def timeout_failure_retry_count
+      get(TIMEOUT_RETRY_KEY) || 0
     end
 
     def spoon_client_config

@@ -34,11 +34,16 @@ require_relative 'simmer/configuration'
 require_relative 'simmer/database'
 require_relative 'simmer/externals'
 require_relative 'simmer/runner'
+require_relative 'simmer/re_runner'
 require_relative 'simmer/specification'
 require_relative 'simmer/suite'
 
 # The main entry-point API for the library.
+
+# TODO: split this up and re-enable this cop:
+# rubocop:disable Metrics/ModuleLength
 module Simmer
+  # rubocop:enable Metrics/ModuleLength
   DEFAULT_CONFIG_PATH = File.join('config', 'simmer.yaml').freeze
   DEFAULT_SIMMER_DIR  = 'simmer'
 
@@ -73,12 +78,18 @@ module Simmer
       fixture_set  = make_fixture_set(configuration)
       spoon_client = make_spoon_client(configuration)
 
-      Runner.new(
+      runner = Runner.new(
         database: database,
         file_system: file_system,
         fixture_set: fixture_set,
         out: out_router,
         spoon_client: spoon_client
+      )
+
+      ReRunner.new(
+        runner,
+        out_router,
+        timeout_failure_retry_count: configuration.timeout_failure_retry_count
       )
     end
 

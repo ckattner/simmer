@@ -53,6 +53,9 @@ The configuration file contains information about external systems, such as:
 Copy this configuration template into your project's root to: `config/simmer.yaml`:
 
 ````yaml
+# Automatically retry a test when it has failed this many times due to a timeout error:
+timeout_failure_retry_count: 0
+
 mysql_database:
   database:
   username:

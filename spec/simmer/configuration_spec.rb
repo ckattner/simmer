@@ -16,6 +16,15 @@ describe Simmer::Configuration do
 
   subject { described_class.new(config, simmer_dir) }
 
+  context '#timeout_failure_retry_count' do
+    it('defaults to 0 (no retry)') { expect(subject.timeout_failure_retry_count).to eq 0 }
+
+    it 'returns the configured value' do
+      subject = described_class.new({ timeout_failure_retry_count: 42 }, simmer_dir)
+      expect(subject.timeout_failure_retry_count).to eq 42
+    end
+  end
+
   specify '#mysql_database_config resolves' do
     expect(subject.mysql_database_config).to eq('mysql_database_key' => 'mysql_database_value')
   end

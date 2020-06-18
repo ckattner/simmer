@@ -50,6 +50,10 @@ module Simmer
         !pass?
       end
 
+      def timed_out?
+        errors.any? { |e| e.is_a?(Timeout::Error) }
+      end
+
       def to_h
         {
           'name' => specification.name,
@@ -59,7 +63,7 @@ module Simmer
           'pass' => pass?,
           'spoon_client_result' => spoon_client_result.to_h,
           'judge_result' => judge_result.to_h,
-          'errors' => errors,
+          'errors' => errors.map(&:message),
         }
       end
     end

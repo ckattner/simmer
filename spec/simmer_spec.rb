@@ -173,7 +173,7 @@ describe Simmer do
       end
 
       it 'records the timeout error' do
-        expect(results.runner_results.first.errors).to include(/execution expired/)
+        expect(results.runner_results.first.errors).to include(Timeout::Error)
       end
 
       specify 'after each callbacks get a failing result with the timeout error' do
@@ -182,7 +182,7 @@ describe Simmer do
 
         expect(results).not_to be_passing
         expect(after_each_result).not_to be_passing
-        expect(after_each_result.errors).to include(/execution expired/)
+        expect(after_each_result.errors).to include(Timeout::Error)
       end
     end
 
@@ -238,7 +238,8 @@ describe Simmer do
           simmer_dir: simmer_dir
         )
 
-        expect(results.runner_results.first.errors).to include(/fixture missing/)
+        expect(results.runner_results.first.errors).to \
+          include(Simmer::Database::FixtureSet::FixtureMissingError)
       end
     end
   end
