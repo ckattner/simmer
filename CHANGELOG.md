@@ -1,8 +1,16 @@
 # Simmer Change Log
 
-## 3.1.0 (TBD, 2020)
+## 4.0.0 (TBD, 2020)
+
+Additions:
 
 * Support for custom test lifecycle hooks to be run before and after a every test or the entire suite.
+* Simmer can now be configured to re-run tests which have failed due to a timeout a custom number of times.
+
+Breaking Changes:
+
+* The `callback_configuration` and `make_runner` methods have been removed from the `Simmer` module.
+
 
 ## 3.0.0 (June 8th, 2020)
 

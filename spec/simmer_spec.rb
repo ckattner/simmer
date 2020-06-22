@@ -13,8 +13,11 @@ require './spec/mocks/out'
 describe Simmer do
   let(:src_config_path) { File.join('spec', 'config', 'simmer.yaml') }
   let(:config)          { yaml_read(src_config_path) }
+  let(:spoon_path) { File.join('spec', 'mocks', 'spoon') }
+  let(:spoon_args) { '' }
+  let(:config_path) { stage_simmer_config(spoon_path, spoon_args) }
 
-  def stage_simmer_config(spoon_dir, args, timeout_in_seconds = nil)
+  def stage_simmer_config(spoon_dir, spoon_args, timeout_in_seconds = nil)
     dest_config_dir  = File.join('tmp')
     dest_config_path = File.join(dest_config_dir, 'simmer.yaml')
 
@@ -26,7 +29,7 @@ describe Simmer do
     new_config = config.merge(
       'spoon_client' => {
         'dir' => spoon_dir,
-        'args' => args,
+        'args' => spoon_args,
         'timeout_in_seconds' => timeout
       }
     )
@@ -40,11 +43,9 @@ describe Simmer do
     let(:spec_path)   { File.join('spec', 'fixtures', 'specifications', 'load_noc_list.yaml') }
     let(:simmer_dir)  { File.join('spec', 'simmer_spec') }
     let(:out)         { Out.new }
-    let(:config_path) { stage_simmer_config(spoon_path, args) }
 
     context 'when pdi does not do anything but does not fail' do
-      let(:spoon_path)  { File.join('spec', 'mocks', 'spoon') }
-      let(:args)        { 0 }
+      let(:spoon_args) { 0 }
 
       specify 'judge determines it does not pass' do
         results = described_class.run(
@@ -59,8 +60,7 @@ describe Simmer do
     end
 
     context 'when pdi fails' do
-      let(:spoon_path)  { File.join('spec', 'mocks', 'spoon') }
-      let(:args)        { 1 }
+      let(:spoon_args) { 1 }
 
       it 'fails' do
         results = described_class.run(
@@ -75,8 +75,8 @@ describe Simmer do
     end
 
     context 'when pdi acts correctly' do
-      let(:spoon_path)  { File.join('spec', 'mocks', 'load_noc_list') }
-      let(:args)        { '' }
+      let(:spoon_path) { File.join('spec', 'mocks', 'load_noc_list') }
+      let(:spoon_args) { '' }
 
       # TODO: extract this to the top level, if they are all the same
       let(:results) do
@@ -124,8 +124,8 @@ describe Simmer do
     end
 
     context 'when pdi acts correctly but judge fails on output assert' do
-      let(:spoon_path)  { File.join('spec', 'mocks', 'load_noc_list_bad_output') }
-      let(:args)        { '' }
+      let(:spoon_path) { File.join('spec', 'mocks', 'load_noc_list_bad_output') }
+      let(:spoon_args) { '' }
       let(:results) do
         described_class.run(
           spec_path,
@@ -155,9 +155,8 @@ describe Simmer do
     end
 
     context 'when pdi times out' do
-      let(:spoon_path)  { File.join('spec', 'mocks', 'spoon') }
-      let(:args)        { [0, 10] }
-      let(:config_path) { stage_simmer_config(spoon_path, args, 1) }
+      let(:spoon_args) { [0, 10] }
+      let(:config_path) { stage_simmer_config(spoon_path, spoon_args, 1) }
 
       let(:results) do
         described_class.run(
@@ -185,39 +184,15 @@ describe Simmer do
         expect(after_each_result.errors).to include(Timeout::Error)
       end
     end
-
-    describe '#make_runner' do
-      let(:spoon_path)  { File.join('spec', 'mocks', 'load_noc_list_bad_output') }
-      let(:args)        { '' }
-
-      subject do
-        described_class.make_runner(
-          described_class.make_configuration(
-            config_path: config_path,
-            simmer_dir: simmer_dir
-          ),
-          $stdout
-        )
-      end
-
-      it 'sets Pdi::Spoon#timeout_in_seconds from configuration' do
-        actual   = subject.spoon_client.spoon.executor.timeout_in_seconds
-        expected = config.dig('spoon_client', 'timeout_in_seconds')
-
-        expect(actual).to eq(expected)
-      end
-    end
   end
 
   context 'when the fixtures are missing' do
     let(:spec_path)   { File.join('spec', 'fixtures', 'specifications', 'missing_fixtures.yaml') }
     let(:simmer_dir)  { File.join('spec', 'simmer_spec') }
     let(:out)         { Out.new }
-    let(:config_path) { stage_simmer_config(spoon_path, args) }
 
     context 'when pdi does not do anything but does not fail' do
-      let(:spoon_path)  { File.join('spec', 'mocks', 'spoon') }
-      let(:args)        { 0 }
+      let(:spoon_args) { 0 }
 
       it 'fails' do
         results = described_class.run(
@@ -241,6 +216,12 @@ describe Simmer do
         expect(results.runner_results.first.errors).to \
           include(Simmer::Database::FixtureSet::FixtureMissingError)
       end
+    end
+  end
+
+  describe '.configuration' do
+    it 'returns a Simmer::Configuration instance' do
+      expect(described_class.configuration(config_path: config_path)).to be_a Simmer::Configuration
     end
   end
 end

@@ -1,0 +1,9 @@
+# This is used by the simmer_bootstrap_spec.rb to test the AWS codepaths.
+
+aws_file_system:
+  access_key_id: test_access_key
+  bucket: bucket-test
+  default_expires_in_seconds: 3600
+  encryption: test_encryption
+  region: test_region
+  secret_access_key: test_secret_key
