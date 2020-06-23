@@ -96,11 +96,11 @@ describe Simmer do
         it 'calls them in the expected order' do
           found_order = []
 
-          described_class.configure do
-            before(:suite) { found_order.push(:before_suite) }
-            before(:each) { found_order.push(:before_each) }
-            after(:each) { found_order.push(:after_each) }
-            after(:suite) { found_order.push(:after_suite) }
+          described_class.configure do |config|
+            config.before(:suite) { found_order.push(:before_suite) }
+            config.before(:each) { found_order.push(:before_each) }
+            config.after(:each) { found_order.push(:after_each) }
+            config.after(:suite) { found_order.push(:after_suite) }
           end
 
           expect(results).to be_passing
@@ -111,9 +111,9 @@ describe Simmer do
           after_each_result = nil
           after_suite_result = nil
 
-          described_class.configure do
-            after(:each) { |result| after_each_result = result }
-            after(:suite) { |result| after_suite_result = result }
+          described_class.configure do |config|
+            config.after(:each) { |result| after_each_result = result }
+            config.after(:suite) { |result| after_suite_result = result }
           end
 
           expect(results).to be_passing
@@ -143,9 +143,9 @@ describe Simmer do
         after_each_result = nil
         after_suite_result = nil
 
-        described_class.configure do
-          after(:each) { |result| after_each_result = result }
-          after(:suite) { |result| after_suite_result = result }
+        described_class.configure do |config|
+          config.after(:each) { |result| after_each_result = result }
+          config.after(:suite) { |result| after_suite_result = result }
         end
 
         expect(results).not_to be_passing
@@ -177,7 +177,7 @@ describe Simmer do
 
       specify 'after each callbacks get a failing result with the timeout error' do
         after_each_result = nil
-        described_class.configure { after(:each) { |result| after_each_result = result } }
+        described_class.configure { |c| c.after(:each) { |result| after_each_result = result } }
 
         expect(results).not_to be_passing
         expect(after_each_result).not_to be_passing

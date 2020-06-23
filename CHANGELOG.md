@@ -10,7 +10,7 @@ Additions:
 Breaking Changes:
 
 * The `callback_configuration` and `make_runner` methods have been removed from the `Simmer` module.
-
+* `Simmer::Runner::Result#errors` now contains error/exception instances instead of strings.
 
 ## 3.0.0 (June 8th, 2020)
 

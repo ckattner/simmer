@@ -278,9 +278,9 @@ bundle exec simmer
 It is possible to define custom test lifecycle hooks. These are very similar to [Rspec](https://relishapp.com/rspec/rspec-core/v/3-9/docs/hooks/before-and-after-hooks). Here is an example of how to ensure that code called before and after the entire suite:
 
 ````ruby
-Simmer.configure do
-  before(:suite) { puts 'about to run the entire suite' }
-  after(:suite) do |result|
+Simmer.configure do |config|
+  config.before(:suite) { puts 'about to run the entire suite' }
+  config.after(:suite) do |result|
     result_msg = result.passed? ? 'passed' : 'failed'
     puts "The suite #{result_msg}."
   end
@@ -292,9 +292,9 @@ Not that after callbacks taken an optional parameter which is the result object.
 It is also possible to specify custom code which runs before and after each individual specification.
 
 ````ruby
-Simmer.configure do
-  before(:each) { puts 'I will run before each test' }
-  after(:each) do |result|
+Simmer.configure do |config|
+  config.before(:each) { puts 'I will run before each test' }
+  config.after(:each) do |result|
     result_msg = result.passed? ? 'passed' : 'failed'
     puts "The specification #{result_msg}."
   end
