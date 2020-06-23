@@ -16,6 +16,14 @@ describe Simmer do
   let(:spoon_path) { File.join('spec', 'mocks', 'spoon') }
   let(:spoon_args) { '' }
   let(:config_path) { stage_simmer_config(spoon_path, spoon_args) }
+  let(:results) do
+    described_class.run(
+      spec_path,
+      config_path: config_path,
+      out: out,
+      simmer_dir: simmer_dir
+    )
+  end
 
   def stage_simmer_config(spoon_dir, spoon_args, timeout_in_seconds = nil)
     dest_config_dir  = File.join('tmp')
@@ -47,46 +55,18 @@ describe Simmer do
     context 'when pdi does not do anything but does not fail' do
       let(:spoon_args) { 0 }
 
-      specify 'judge determines it does not pass' do
-        results = described_class.run(
-          spec_path,
-          config_path: config_path,
-          out: out,
-          simmer_dir: simmer_dir
-        )
-
-        expect(results).not_to be_passing
-      end
+      specify('judge determines it does not pass') { expect(results).not_to be_passing }
     end
 
     context 'when pdi fails' do
       let(:spoon_args) { 1 }
 
-      it 'fails' do
-        results = described_class.run(
-          spec_path,
-          config_path: config_path,
-          out: out,
-          simmer_dir: simmer_dir
-        )
-
-        expect(results).not_to be_passing
-      end
+      it('fails') { expect(results).not_to be_passing }
     end
 
     context 'when pdi acts correctly' do
       let(:spoon_path) { File.join('spec', 'mocks', 'load_noc_list') }
       let(:spoon_args) { '' }
-
-      # TODO: extract this to the top level, if they are all the same
-      let(:results) do
-        described_class.run(
-          spec_path,
-          config_path: config_path,
-          out: out,
-          simmer_dir: simmer_dir
-        )
-      end
 
       specify 'the judge determines it to pass' do
         expect(results).to be_passing
@@ -126,14 +106,6 @@ describe Simmer do
     context 'when pdi acts correctly but judge fails on output assert' do
       let(:spoon_path) { File.join('spec', 'mocks', 'load_noc_list_bad_output') }
       let(:spoon_args) { '' }
-      let(:results) do
-        described_class.run(
-          spec_path,
-          config_path: config_path,
-          out: out,
-          simmer_dir: simmer_dir
-        )
-      end
 
       specify 'fails' do
         expect(results).not_to be_passing
@@ -157,15 +129,6 @@ describe Simmer do
     context 'when pdi times out' do
       let(:spoon_args) { [0, 10] }
       let(:config_path) { stage_simmer_config(spoon_path, spoon_args, 1) }
-
-      let(:results) do
-        described_class.run(
-          spec_path,
-          config_path: config_path,
-          out: out,
-          simmer_dir: simmer_dir
-        )
-      end
 
       it 'fails' do
         expect(results).not_to be_passing
