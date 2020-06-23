@@ -51,7 +51,7 @@ module Simmer
       end
 
       def timed_out?
-        errors.any? { |e| e.is_a?(Timeout::Error) }
+        errors.any? { |e| e.is_a?(Simmer::Runner::TimeoutError) }
       end
 
       def to_h

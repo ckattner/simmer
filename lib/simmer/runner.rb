@@ -9,6 +9,7 @@
 
 require_relative 'judge'
 require_relative 'runner/result'
+require_relative 'runner/timeout_error'
 
 module Simmer
   # Runs a single specification.
@@ -41,8 +42,7 @@ module Simmer
           specification: specification,
           spoon_client_result: spoon_client_result
         ).tap { |result| out.final_verdict(result) }
-      rescue Database::FixtureSet::FixtureMissingError, Timeout::Error => e
-        # TODO: wrap Timeout::Error
+      rescue Database::FixtureSet::FixtureMissingError, Simmer::Runner::TimeoutError => e
         Result.new(id: id, specification: specification, errors: e)
               .tap { |result| out.final_verdict(result) }
       end
@@ -114,7 +114,7 @@ module Simmer
       spoon_client_result
     rescue Timeout::Error => e
       out.console_puts('Timed out')
-      raise e
+      raise Simmer::Runner::TimeoutError, e
     end
 
     def assert(specification, spoon_client_result)

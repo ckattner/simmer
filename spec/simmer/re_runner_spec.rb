@@ -37,7 +37,7 @@ describe Simmer::ReRunner do
 
   describe 'when a test fails due to a timeout' do
     let(:timeout_result) do
-      errors = [Timeout::Error.new]
+      errors = [Simmer::Runner::TimeoutError.new]
       Simmer::Runner::Result.new(id: :timeout, specification: :foo, errors: errors)
     end
 

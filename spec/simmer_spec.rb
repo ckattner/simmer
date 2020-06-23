@@ -172,7 +172,7 @@ describe Simmer do
       end
 
       it 'records the timeout error' do
-        expect(results.runner_results.first.errors).to include(Timeout::Error)
+        expect(results.runner_results.first.errors).to include(Simmer::Runner::TimeoutError)
       end
 
       specify 'after each callbacks get a failing result with the timeout error' do
@@ -181,7 +181,7 @@ describe Simmer do
 
         expect(results).not_to be_passing
         expect(after_each_result).not_to be_passing
-        expect(after_each_result.errors).to include(Timeout::Error)
+        expect(after_each_result.errors).to include(Simmer::Runner::TimeoutError)
       end
     end
   end
