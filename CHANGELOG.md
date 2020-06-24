@@ -11,6 +11,8 @@ Breaking Changes:
 
 * The `callback_configuration` and `make_runner` methods have been removed from the `Simmer` module.
 * `Simmer::Runner::Result#errors` now contains error/exception instances instead of strings.
+* `Simmer::Suite.new` and `Simmer::Runner.run` now takes a `Simmer::Configuration` instance instead of a hash of configuration values.
+* The config keyword parameter of `Simmer::Runner.run` is now mandatory.
 
 ## 3.0.0 (June 8th, 2020)
 

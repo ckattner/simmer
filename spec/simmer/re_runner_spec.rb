@@ -48,7 +48,7 @@ describe Simmer::ReRunner do
       subject.run
     end
 
-    it 'only runs the test three times when timeout_failure_retry_count = 2' do
+    it 'runs the test three times when timeout_failure_retry_count = 2' do
       subject = described_class.new(runner_double, out, timeout_failure_retry_count: 2)
       expect(runner_double).to receive(:run).exactly(3).times.and_return(timeout_result)
 
